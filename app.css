@@ -94,25 +94,26 @@ body {
 	border-radius: 5px;
 }
 
-#popupContainer {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100vw;
-	height: 100vh;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
 .popupOverlay {
 	width: 100%;
 	height: 100%;
 	background: black;
-	opacity: 0.5;
+	opacity: 0;
 	position: absolute;
 	top: 0;
 	left: 0;
+}
+
+.showOverlay {
+	display: block;
+	opacity: 0.5;
+	transition: 750ms ease-in-out;
+}
+
+.hideOverlay {
+	display: none;
+	opacity: 0;
+	transition: 750ms ease-in-out;
 }
 
 .newTaskPopup {
@@ -121,9 +122,19 @@ body {
 	padding: 50px 0px;
 	width: 100%;
 	position: absolute;
-	bottom: 0;
+	left: 0;
 	border-top-left-radius: 25px;
 	border-top-right-radius: 25px;
+}
+
+.showPopup {
+	bottom: 0%;
+	transition: 250ms ease-in-out;
+}
+
+.hidePopup {
+	bottom: -100%;
+	transition: 250ms ease-in-out;
 }
 
 .newTaskPopup div {
