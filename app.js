@@ -1,9 +1,7 @@
-//  1.  Eine Factory Function für neue Tasks erstellen:
-//      - Parameter: Name, Category, isDone
-//      - Die Task zum Array pushen
-//      - Die Task anzeigen lassen
-
 document.addEventListener("DOMContentLoaded", () => {
+	// Shortening queryselectors
+	const qs = (el) => document.querySelector(el);
+
 	const taskManager = (() => {
 		let tasks = [];
 
@@ -30,32 +28,29 @@ document.addEventListener("DOMContentLoaded", () => {
 		};
 	})();
 
-	const createNewTask = (name, category, isDone) => {
-		return {
-			name,
-			category,
-			isDone,
-		};
-	};
-
-	const createFrontend = (() => {
-		// Shortening queryselectors
-		const qs = (el) => document.querySelector(el);
-
+	const frontendManager = (() => {
 		const appContainer = qs("#app");
 		const taskContainer = qs("#taskContainer");
 		const categoryContainer = qs("#categorieList");
-		let tasks = taskManager.getTasks();
+		const formCatSelect = qs("#formCatSelect");
+
+		const tasks = taskManager.getTasks();
 		const categories = ["📌 Wichtig", "⏳ Dringend", "📝 Allgemein", "🏠 Haushalt", "🍽 Essen & Einkaufen", "🏋️‍♂️ Fitness & Gesundheit", "📚 Lernen & Weiterbildung", "🎯 Ziele & Projekte", "🎉 Freizeit & Hobbys", "📧 E-Mails & Kommunikation", "📅 Meetings & Termine", "🚀 Projekte & Deadlines", "🔍 Recherchen & Ideen", "💰 Finanzen & Rechnungen", "🔄 Wiederkehrend", "✈️ Reisen & Urlaube"];
 
 		const initialUpdate = () => {
+			categories.forEach((category) => {
+				formCatSelect.innerHTML += `
+                <option>${category}</option>
+            `;
+			});
+
 			updateTasks();
 			updateCategories();
 		};
 
 		const updateTasks = (passedTasks) => {
-			taskContainer.innerHTML = "";
-			const taskList = document.createElement("ul");
+			const taskList = qs(".taskList");
+			taskList.innerHTML = "";
 			taskContainer.appendChild(taskList);
 			currentTasks = passedTasks || tasks;
 
@@ -71,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		};
 
 		const updateCategories = () => {
+			categoryContainer.innerHTML = "";
 			const categoryList = document.createElement("ul");
 			categoryContainer.appendChild(categoryList);
 			const currentCats = [];
@@ -104,51 +100,87 @@ document.addEventListener("DOMContentLoaded", () => {
 		return { initialUpdate, updateTasks, updateCategories, removeActiveClass, filterTasks };
 	})();
 
-	// Initial Tasks
+	const createNewTask = (name, category, isDone) => {
+		return {
+			name,
+			category,
+			isDone,
+		};
+	};
+
+	// Initial tasks
 	const task1 = createNewTask("Sauber machen", "🏠 Haushalt", false);
 	const task2 = createNewTask("JavaScript lernen", "📚 Lernen & Weiterbildung", false);
 	const task3 = createNewTask("Einkaufen", "🍽 Essen & Einkaufen", false);
-	const task4 = createNewTask("Arzttermin", "🏥 Gesundheit", false);
-	const task5 = createNewTask("Meeting vorbereiten", "📧 E-Mails & Kommunikation", false);
-	const task6 = createNewTask("Wäsche waschen", "🏠 Haushalt", false);
-	const task7 = createNewTask("Node.js lernen", "📚 Lernen & Weiterbildung", false);
-	const task8 = createNewTask("Lebensmittel einkaufen", "🍽 Essen & Einkaufen", false);
-	const task9 = createNewTask("Blutdruck messen", "🏥 Gesundheit", false);
-	const task10 = createNewTask("Projektbericht schreiben", "📧 E-Mails & Kommunikation", false);
-	const task11 = createNewTask("Staub wischen", "🏠 Haushalt", false);
-	const task12 = createNewTask("React lernen", "📚 Lernen & Weiterbildung", false);
-	const task13 = createNewTask("Hundefutter kaufen", "🍽 Essen & Einkaufen", false);
-	const task14 = createNewTask("Zahnarzttermin", "🏥 Gesundheit", false);
-	const task15 = createNewTask("E-Mails beantworten", "📧 E-Mails & Kommunikation", false);
 
+	// Adding tasks to array
 	taskManager.addTask(task1);
 	taskManager.addTask(task2);
 	taskManager.addTask(task3);
-	taskManager.addTask(task4);
-	taskManager.addTask(task5);
-	taskManager.addTask(task6);
-	taskManager.addTask(task7);
-	taskManager.addTask(task8);
-	taskManager.addTask(task9);
-	taskManager.addTask(task10);
-	taskManager.addTask(task11);
-	taskManager.addTask(task12);
-	taskManager.addTask(task13);
-	taskManager.addTask(task14);
-	taskManager.addTask(task15);
 
-	createFrontend.initialUpdate();
+	frontendManager.initialUpdate();
 
+	// Variables
 	const taskCategories = document.querySelectorAll(".taskCategory");
+	const newTaskBtn = qs("#newTaskBtn");
+	const formSubmitBtn = qs("#formSubmitBtn");
+	const newTaskPopup = qs(".newTaskPopup");
+	const popupOverlay = qs(".popupOverlay");
+	const form = qs("form");
+	const formTaskInput = qs("#formTaskInput");
+	const formCatSelect = qs("#formCatSelect");
+
+	// Filtering tasks
 	taskCategories.forEach((category) => {
 		category.addEventListener("click", () => {
 			const targetCategory = category.textContent;
-			createFrontend.filterTasks(targetCategory);
-			createFrontend.removeActiveClass();
+			frontendManager.filterTasks(targetCategory);
+			frontendManager.removeActiveClass();
 			category.classList.add("activeButton");
 		});
 	});
+
+	// All tasks filter button
 	document.querySelector(".allCats").addEventListener("click", () => {
-		createFrontend.updateTasks();
+		frontendManager.updateTasks();
+	});
+
+	// Shows and hides popup overlay
+	popupOverlay.addEventListener("click", (target) => {
+		popupOverlay.classList.toggle("showOverlay");
+		popupOverlay.classList.toggle("hideOverlay");
+		newTaskPopup.classList.toggle("showPopup");
+		newTaskPopup.classList.toggle("hidePopup");
+	});
+
+	// Shows and hides new task popup
+	newTaskBtn.addEventListener("click", () => {
+		popupOverlay.classList.toggle("showOverlay");
+		popupOverlay.classList.toggle("hideOverlay");
+		newTaskPopup.classList.toggle("showPopup");
+		newTaskPopup.classList.toggle("hidePopup");
+	});
+
+	// Creates new task, adds it to our array and displays in the frontend
+	formSubmitBtn.addEventListener("click", (event) => {
+		event.preventDefault();
+
+		if (formTaskInput.value === "") {
+			alert("Du musst eine Beschreibung für dein To-Do hinzufügen.");
+		} else if (formCatSelect.value === "Kategorie auswählen...") {
+			alert("Du musst eine Kategorie auswählen.");
+		} else {
+			taskManager.addTask(createNewTask(formTaskInput.value, formCatSelect.value, false));
+			frontendManager.updateTasks();
+			frontendManager.updateCategories();
+
+			formTaskInput.value = "";
+			formCatSelect.value = "Kategorie auswählen...";
+
+			popupOverlay.classList.toggle("showOverlay");
+			popupOverlay.classList.toggle("hideOverlay");
+			newTaskPopup.classList.toggle("showPopup");
+			newTaskPopup.classList.toggle("hidePopup");
+		}
 	});
 });
