@@ -12,6 +12,21 @@
 			<h1>To-Do Liste</h1>
 			<div id="categorieList"></div>
 			<div id="taskContainer"></div>
+			<div id="popupContainer">
+				<div class="popupOverlay"></div>
+				<div class="newTaskPopup">
+					<div>
+						<h2>Füge ein neues To-Do hinzu 😄</h2>
+						<form>
+							<input id="formTaskInput" placeholder="Beschreibung..." />
+							<select id="formCatSelect">
+								<option disabled selected>Kategorie auswählen...</option>
+							</select>
+							<button id="formSubmitBtn" type="submit">To-Do hinzufügen</button>
+						</form>
+					</div>
+				</div>
+			</div>
 		</div>
 	</body>
 </html>
