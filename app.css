@@ -88,3 +88,14 @@ body {
 	color: white;
 	transition: 250ms ease-in-out;
 }
+
+#newTaskBtn {
+	padding: 15px;
+	width: 100%;
+	color: #1d4138;
+	font-size: 1.1rem;
+	font-weight: 600;
+	background: none;
+	border: 1px dashed #002c21;
+	border-radius: 5px;
+}
