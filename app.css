@@ -135,6 +135,7 @@ body {
 .hidePopup {
 	bottom: -100%;
 	transition: 250ms ease-in-out;
+	display: none;
 }
 
 .newTaskPopup div {
