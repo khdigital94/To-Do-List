@@ -79,4 +79,12 @@ body {
 	border: 1px solid #f7f7f7;
 	border-radius: 5px;
 	min-width: fit-content;
+	transition: 250ms ease-in-out;
+}
+
+#categorieList ul li .activeButton {
+	background: #002c21;
+	border: 1px solid #1d4138;
+	color: white;
+	transition: 250ms ease-in-out;
 }
