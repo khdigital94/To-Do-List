@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	frontendManager.initialUpdate();
 
 	// Variables
-	const taskCategories = document.querySelectorAll(".taskCategory");
+	const taskCategories = qs("#categorieList");
 	const newTaskBtn = qs("#newTaskBtn");
 	const formSubmitBtn = qs("#formSubmitBtn");
 	const newTaskPopup = qs(".newTaskPopup");
@@ -131,14 +131,19 @@ document.addEventListener("DOMContentLoaded", () => {
 	const formCatSelect = qs("#formCatSelect");
 
 	// Filtering tasks
-	taskCategories.forEach((category) => {
-		category.addEventListener("click", () => {
-			const targetCategory = category.textContent;
-			frontendManager.filterTasks(targetCategory);
+	taskCategories.addEventListener("click", (event) => {
+		if (event.target.classList.contains("taskCategory")) {
+
+			const target = event.target;
+			console.log(target);
+
+			if (target.textContent !== "Alle") {
+				frontendManager.filterTasks(target.textContent);	
+			}
 			frontendManager.removeActiveClass();
-			category.classList.add("activeButton");
-		});
-	});
+			target.classList.add("activeButton");
+		}
+	})
 
 	// All tasks filter button
 	document.querySelector(".allCats").addEventListener("click", () => {
