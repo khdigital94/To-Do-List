@@ -133,9 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	// Filtering tasks
 	taskCategories.addEventListener("click", (event) => {
 		if (event.target.classList.contains("taskCategory")) {
-
 			const target = event.target;
-			console.log(target);
 
 			if (target.textContent !== "Alle") {
 				frontendManager.filterTasks(target.textContent);	
