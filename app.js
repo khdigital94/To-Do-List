@@ -8,6 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		const addTask = (task) => {
 			tasks.push(task);
 		};
+		const createTaskId = () => {
+			return crypto.randomUUID();
+		}
 		const editTask = (task, newName, newCategory) => {
 			task.name = newName;
 			task.category = newCategory;
@@ -18,13 +21,16 @@ document.addEventListener("DOMContentLoaded", () => {
 		const getTasks = (task) => {
 			return tasks;
 		};
+		const setTasks = (taskList) => {tasks = taskList}
 
 		return {
 			tasks,
 			addTask,
+			createTaskId,
 			editTask,
 			finishTask,
 			getTasks,
+			setTasks
 		};
 	})();
 
@@ -34,8 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		const categoryContainer = qs("#categorieList");
 		const formCatSelect = qs("#formCatSelect");
 
-		const tasks = taskManager.getTasks();
-		const categories = ["📌 Wichtig", "⏳ Dringend", "📝 Allgemein", "🏠 Haushalt", "🍽 Essen & Einkaufen", "🏋️‍♂️ Fitness & Gesundheit", "📚 Lernen & Weiterbildung", "🎯 Ziele & Projekte", "🎉 Freizeit & Hobbys", "📧 E-Mails & Kommunikation", "📅 Meetings & Termine", "🚀 Projekte & Deadlines", "🔍 Recherchen & Ideen", "💰 Finanzen & Rechnungen", "🔄 Wiederkehrend", "✈️ Reisen & Urlaube"];
+		const categories = 
+			["📌 Wichtig", "⏳ Dringend", "📝 Allgemein", "🏠 Haushalt", "🍽 Essen & Einkaufen", "🏋️‍♂️ Fitness & Gesundheit", "📚 Lernen & Weiterbildung", "🎯 Ziele & Projekte", "🎉 Freizeit & Hobbys", "📧 E-Mails & Kommunikation", "📅 Meetings & Termine", "🚀 Projekte & Deadlines", "🔍 Recherchen & Ideen", "💰 Finanzen & Rechnungen", "🔄 Wiederkehrend", "✈️ Reisen & Urlaube"
+
+			];
 
 		const initialUpdate = () => {
 			categories.forEach((category) => {
@@ -52,15 +60,17 @@ document.addEventListener("DOMContentLoaded", () => {
 			const taskList = qs(".taskList");
 			taskList.innerHTML = "";
 			taskContainer.appendChild(taskList);
-			currentTasks = passedTasks || tasks;
+			currentTasks = passedTasks || taskManager.getTasks();
 
 			currentTasks.forEach((task) => {
-				const id = crypto.randomUUID();
 				taskList.innerHTML += `
-                    <li data-id="${id}">
+				<li data-id="${task.id}" class="task">
+                    <div class="taskDiv">
                         <h3>${task.name}</h3> 
                         <p>Kategorie: ${task.category}</p>
-                    </li>
+                    </div>
+					<button class="removeTask">Remove</button>
+				</li>
                 `;
 			});
 		};
@@ -69,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			categoryContainer.innerHTML = "";
 			const categoryList = document.createElement("ul");
 			categoryContainer.appendChild(categoryList);
+			const tasks = taskManager.getTasks();
 			const currentCats = [];
 
 			categoryList.innerHTML += `
@@ -76,6 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
 
 			tasks.forEach((task) => {
+				console.log("Adding cat...")
 				if (!currentCats.includes(task.category)) {
 					currentCats.push(task.category);
 					categoryList.innerHTML += `
@@ -93,6 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		};
 
 		const filterTasks = (category) => {
+			const tasks = taskManager.getTasks();
 			const arr = tasks.filter((task) => task.category === category);
 			updateTasks(arr);
 		};
@@ -100,18 +113,19 @@ document.addEventListener("DOMContentLoaded", () => {
 		return { initialUpdate, updateTasks, updateCategories, removeActiveClass, filterTasks };
 	})();
 
-	const createNewTask = (name, category, isDone) => {
+	const createNewTask = (name, category, isDone, id) => {
 		return {
 			name,
 			category,
 			isDone,
+			id
 		};
 	};
 
 	// Initial tasks
-	const task1 = createNewTask("Sauber machen", "🏠 Haushalt", false);
-	const task2 = createNewTask("JavaScript lernen", "📚 Lernen & Weiterbildung", false);
-	const task3 = createNewTask("Einkaufen", "🍽 Essen & Einkaufen", false);
+	const task1 = createNewTask("Sauber machen", "🏠 Haushalt", false, taskManager.createTaskId());
+	const task2 = createNewTask("JavaScript lernen", "📚 Lernen & Weiterbildung", false, taskManager.createTaskId());
+	const task3 = createNewTask("Einkaufen", "🍽 Essen & Einkaufen", false, taskManager.createTaskId());
 
 	// Adding tasks to array
 	taskManager.addTask(task1);
@@ -121,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	frontendManager.initialUpdate();
 
 	// Variables
+	const taskContainer = qs("#taskContainer")
 	const taskCategories = qs("#categorieList");
 	const newTaskBtn = qs("#newTaskBtn");
 	const formSubmitBtn = qs("#formSubmitBtn");
@@ -130,6 +145,22 @@ document.addEventListener("DOMContentLoaded", () => {
 	const formTaskInput = qs("#formTaskInput");
 	const formCatSelect = qs("#formCatSelect");
 
+	taskContainer.addEventListener("click", (event) => {
+		if (event.target.classList.contains("taskDiv")) {
+			event.target.classList.toggle("swipeTask")
+		}
+
+		if (event.target.classList.contains("removeTask")) {
+			const taskId = event.target.closest(".task").dataset.id;
+			const currentTasks = taskManager.getTasks();
+			const newTaskList = (taskManager.getTasks()).filter((task) => task.id !== taskId);
+
+			taskManager.setTasks(newTaskList);
+			frontendManager.updateTasks(newTaskList);
+			frontendManager.updateCategories();
+		}
+	})
+
 	// Filtering tasks
 	taskCategories.addEventListener("click", (event) => {
 		if (event.target.classList.contains("taskCategory")) {
@@ -137,16 +168,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			if (target.textContent !== "Alle") {
 				frontendManager.filterTasks(target.textContent);	
+			} else {
+				frontendManager.updateTasks();
+				frontendManager.updateCategories();
 			}
 			frontendManager.removeActiveClass();
 			target.classList.add("activeButton");
 		}
 	})
-
-	// All tasks filter button
-	document.querySelector(".allCats").addEventListener("click", () => {
-		frontendManager.updateTasks();
-	});
 
 	// Shows and hides popup overlay
 	popupOverlay.addEventListener("click", (target) => {
@@ -173,7 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		} else if (formCatSelect.value === "Kategorie auswählen...") {
 			alert("Du musst eine Kategorie auswählen.");
 		} else {
-			taskManager.addTask(createNewTask(formTaskInput.value, formCatSelect.value, false));
+			taskManager.addTask(createNewTask(formTaskInput.value, formCatSelect.value, false, taskManager.createTaskId()));
 			frontendManager.updateTasks();
 			frontendManager.updateCategories();
 
